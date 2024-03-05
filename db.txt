@@ -1,0 +1,11 @@
+User DB
+username,  password
+
+Farm DB
+Croptypes,regionType,SoilType,userid,layoutid
+
+Layout DB
+id,userid, sprinklerlayout (ids for all this)
+
+Sprinkler DB
+id, name, cropType, ifOn
