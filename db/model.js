@@ -6,7 +6,7 @@ let schema = new mongoose.Schema({
 const User = mongoose.model('User', schema);
 
 schema = new mongoose.Schema({
-    userId: [Number],
+    userId: String,
     cropTypes: [String],
     regionType: String,
     soilType: String,

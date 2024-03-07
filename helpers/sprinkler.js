@@ -12,7 +12,7 @@ const addSprinklers = async (layout) => {
 }
 
 const addSprinkler = async () => {
-    let farm = await Sprinkler.collection.insertOne({ sprinkerName: "", cropType: "", ifOn: false });
+    let farm = await Sprinkler.collection.insertOne({ sprinklerName: "", cropType: "", ifOn: false });
     return farm.insertedId.toString();
 
 }

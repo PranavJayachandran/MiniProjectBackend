@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const userRoutes = require("./routes/user");
 const farmRoutes = require("./routes/farm");
-const mongoose = require('mongoose');
+const sprinklerRoutes = require("./routes/sprinkler");
 app.use(cors());
 app.use(express.json());
 
@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/user", userRoutes)
 app.use("/farm", farmRoutes)
+app.use("/sprinkler", sprinklerRoutes)
 
 app.get('/', (req, res) => {
     res.send('Hello, World!');
