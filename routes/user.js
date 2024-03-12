@@ -4,11 +4,6 @@ const mongoose = require("mongoose");
 const { User } = require("../db/model");
 
 const getUser = (userName, passWord) => {
-    let schema = new mongoose.Schema({
-        userName: String,
-        passWord: String
-    });
-    const User = mongoose.model('User', schema);
     return new User({
         userName: userName,
         passWord: passWord
@@ -51,17 +46,17 @@ router.post("/signup", (req, res) => {
             let user = getUser(userName, passWord);
             let msg = ""
             user.save()
-                .then(() => {
+                .then((temp) => {
                     msg = 'Document saved successfully';
+                    res.send({ id: temp.id })
                 })
                 .catch((error) => {
                     console.error('Error saving document:', error);
                     msg = "Error";
+                    res.send({ msg: msg })
+
                 })
                 .finally(() => {
-                    // Close the connection
-                    mongoose.connection.close();
-                    res.send({ msg: msg, id: id })
                 });
         }
         )

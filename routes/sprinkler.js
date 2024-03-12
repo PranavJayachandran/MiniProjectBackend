@@ -74,4 +74,23 @@ router.post("/changeState", (req, res) => {
         });
 
 })
+router.post("/numberofsprinklerOn", (req, res) => {
+    let { userId } = req.body;
+    console.log('65f098d43c25a06910c98237');
+    const uri = process.env.MONGODB_CONNECTIONSTRING;
+    mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }).then(async () => {
+        let sprinkler = await Sprinkler.find({ ifOn: true, userId: userId });
+        console.log(sprinkler);
+        res.send({ number: sprinkler.length });
+    }).catch((error) => {
+        console.error('Error saving document:', error);
+        msg = "Error";
+        res.send({ msg: "Error" })
+    })
+        .catch((error) => {
+            console.error('Error connecting to MongoDB:', error);
+            res.send({ msg: "Error" })
+        });
+
+})
 module.exports = router 

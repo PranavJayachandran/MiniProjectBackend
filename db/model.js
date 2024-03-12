@@ -26,7 +26,8 @@ const Layout = mongoose.model('Layout', schema);
 schema = new mongoose.Schema({
     sprinklerName: String,
     cropType: String,
-    ifOn: Boolean
+    ifOn: Boolean,
+    userId: String
 });
 const Sprinkler = mongoose.model('Sprinkler', schema);
 
