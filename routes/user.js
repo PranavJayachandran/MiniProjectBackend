@@ -25,6 +25,7 @@ router.post("/login", (req, res) => {
             })
             .catch(error => {
                 console.log(error);
+                res.send({ err: "Unknown Error" })
             })
     }).catch((error) => {
         console.error('Error saving document:', error);
@@ -32,7 +33,7 @@ router.post("/login", (req, res) => {
     })
         .catch((error) => {
             console.error('Error connecting to MongoDB:', error);
-            res.send({ msg: "Error" })
+            res.send({ err: "Error connecting to the Db" })
         });
 
 })
@@ -41,28 +42,31 @@ router.post("/signup", (req, res) => {
     console.log(userName, passWord);
     const uri = process.env.MONGODB_CONNECTIONSTRING
     mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-        .then(() => {
-            console.log('Connected to MongoDB');
-            let user = getUser(userName, passWord);
-            let msg = ""
-            user.save()
-                .then((temp) => {
-                    msg = 'Document saved successfully';
-                    res.send({ id: temp.id })
-                })
-                .catch((error) => {
-                    console.error('Error saving document:', error);
-                    msg = "Error";
-                    res.send({ msg: msg })
+        .then(async () => {
+            let user = await User.find({ userName: userName })
+            if (user.length > 0) {
+                res.send({ err: "Account with the same username already exists" });
+            }
+            else {
+                let user = getUser(userName, passWord);
+                let msg = ""
+                user.save()
+                    .then((temp) => {
+                        msg = 'Document saved successfully';
+                        res.send({ id: temp.id })
+                    })
+                    .catch((error) => {
+                        console.error('Error saving document:', error);
+                        msg = "Error saving the data";
+                        res.send({ err: msg })
 
-                })
-                .finally(() => {
-                });
+                    })
+            }
         }
         )
         .catch((error) => {
             console.error('Error connecting to MongoDB:', error);
-            res.send({ msg: "Error" })
+            res.send({ err: "Error connecting to the Db" })
         });
 })
 
