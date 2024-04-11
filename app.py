@@ -20,15 +20,18 @@ def predictwaterrequirement():
     weather_condition=input_json['weather_condition']
     with open('model.pkl', 'rb') as file:
         model = pickle.load(file)
+    clf = pickle.load( open('model.pkl', 'rb') )
+    clf.__getstate__()['_sklearn_version']
 
     new_data = pd.DataFrame({
-    'CROP TYPE': [1],
-    'SOIL TYPE': [2],
-    'REGION': [1],
-    'TEMPERATURE GROUP': [13],
-    'WEATHER CONDITION': [400]
+    'CROP TYPE': [croptype],
+    'SOIL TYPE': [soiltype],
+    'REGION': [region],
+    'TEMPERATURE GROUP': [temperature],
+    'WEATHER CONDITION': [weather_condition]
     })
     prediction = model.predict(new_data)
+    print(prediction)
     return str((round(prediction[0], 2)))
 
 # main driver function

@@ -27,7 +27,8 @@ schema = new mongoose.Schema({
     sprinklerName: String,
     cropType: String,
     ifOn: Boolean,
-    userId: String
+    userId: String,
+    waterTime:Number
 });
 const Sprinkler = mongoose.model('Sprinkler', schema);
 

@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router();
 const mongoose = require("mongoose");
 const { Sprinkler, Farm } = require("../db/model");
-const { addSprinklers,MapWeatherToWeatherCondition, mapCropType, mapRegionType, mapSoilType, mapTemperature } = require("../helpers/sprinkler");
+const { addSprinklers, MapWeatherToWeatherCondition, mapCropType, mapRegionType, mapSoilType, mapTemperature } = require("../helpers/sprinkler");
 const { ObjectId } = mongoose.Types;
 
 //Here a post request for a get, becuase the url will become huge passing id as url parameter in get
@@ -91,19 +91,19 @@ router.post("/numberofsprinklerOn", (req, res) => {
             res.send({ msg: "Error" })
         });
 })
-router.post("/predict",async (req,res)=>{
-    let {temperature,weather,sprinklerID,userId}=req.body;
-    let cropType,soilType,regionType;
+router.post("/predict", async (req, res) => {
+    let { temperature, weather, sprinklerID, userId } = req.body;
+    let cropType, soilType, regionType;
     let _id = new ObjectId(sprinklerID);
     const uri = process.env.MONGODB_CONNECTIONSTRING;
-    let connection =await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    let sprinkler=await Sprinkler.findOne({_id:_id});
-    cropType=sprinkler.cropType;
-    let farm = await Farm.findOne({ userId:userId});
-    soilType=farm.soilType;
-    regionType=farm.regionType;
+    let connection = await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    let sprinkler = await Sprinkler.findOne({ _id: _id });
+    cropType = sprinkler.cropType;
+    let farm = await Farm.findOne({ userId: userId });
+    soilType = farm.soilType;
+    regionType = farm.regionType;
 
-    let response=await fetch("http://127.0.0.1:5000/predict", {
+    let response = await fetch("http://127.0.0.1:5000/predict", {
         method: 'post',
         body: JSON.stringify({
             soiltype: mapSoilType(soilType),
@@ -113,14 +113,16 @@ router.post("/predict",async (req,res)=>{
             weather_condition: MapWeatherToWeatherCondition(weather)
         }),
     })
-    try{
-    let result=await response.json();
-    res.send({result:result});
+    try {
+        let result = await response.json();
+        let sprinkler = await Sprinkler.findOne({ _id: _id });
+        sprinkler.waterTime=result;
+        await sprinkler.save();
+        res.send("Done"); 
     }
-    catch(error)
-    {
+    catch (error) {
         console.error(error);
-        res.send({err:error})
+        res.send({ err: error })
     }
 
 })
