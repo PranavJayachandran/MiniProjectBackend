@@ -53,7 +53,7 @@ router.post("/changeData", (req, res) => {
 })
 
 router.post("/changeState", (req, res) => {
-    let { id, ifOn } = req.body;
+    let { id, ifOn ,time,amt} = req.body;
     const uri = process.env.MONGODB_CONNECTIONSTRING;
     let msg = "";
     let _id = new ObjectId(id);
@@ -61,6 +61,8 @@ router.post("/changeState", (req, res) => {
     mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }).then(async () => {
         let sprinkler = await Sprinkler.findOne({ _id: _id });
         sprinkler.ifOn = ifOn
+        sprinkler.time=time
+        sprinkler.amt=amt
         await sprinkler.save();
         res.send("Done");
     }).catch((error) => {
