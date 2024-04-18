@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router();
 const mongoose = require("mongoose");
 const { Sprinkler, Farm } = require("../db/model");
-const { addSprinklers, MapWeatherToWeatherCondition, mapCropType, mapRegionType, mapSoilType, mapTemperature } = require("../helpers/sprinkler");
+const { addSprinklers, MapWeatherToWeatherCondition, mapCropType, mapRegionType, mapSoilType, mapTemperature, amountToTime } = require("../helpers/sprinkler");
 const { ObjectId } = mongoose.Types;
 
 //Here a post request for a get, becuase the url will become huge passing id as url parameter in get
@@ -124,7 +124,15 @@ router.post("/predict", async (req, res) => {
         console.error(error);
         res.send({ err: error })
     }
-
+})
+router.post("/water", async (req, res) => {
+    let {   sprinklerID } = req.body;
+    let _id = new ObjectId(sprinklerID);
+    const uri = process.env.MONGODB_CONNECTIONSTRING;
+    let connection = await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    let sprinkler = await Sprinkler.findOne({ _id: _id });
+    console.log("Sending",String(amountToTime(sprinkler.waterTime*2.5)));
+    res.send(String(amountToTime(sprinkler.waterTime*2.5)));
 })
 
 module.exports = router 

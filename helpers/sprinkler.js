@@ -73,4 +73,7 @@ const mapTemperature = (temperature) => {
     else if (temperature >= 10)
         return 1;
 }
-module.exports = {mapTemperature, addSprinklers, mapSoilType, mapRegionType, MapWeatherToWeatherCondition, mapCropType }
+const amountToTime=(water)=>{
+    return (water/30)*1000;
+}
+module.exports = {mapTemperature, addSprinklers, mapSoilType, mapRegionType, MapWeatherToWeatherCondition, mapCropType,amountToTime }
