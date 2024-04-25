@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const { Sprinkler, Farm } = require("../db/model");
 const { addSprinklers, MapWeatherToWeatherCondition, mapCropType, mapRegionType, mapSoilType, mapTemperature, amountToTime } = require("../helpers/sprinkler");
+const { scheduler } = require("../scheduler");
 const { ObjectId } = mongoose.Types;
 
 //Here a post request for a get, becuase the url will become huge passing id as url parameter in get
@@ -54,6 +55,7 @@ router.post("/changeData", (req, res) => {
 
 router.post("/changeState", (req, res) => {
     let { id, ifOn ,time,amt} = req.body;
+    console.log(id,time,amt);
     const uri = process.env.MONGODB_CONNECTIONSTRING;
     let msg = "";
     let _id = new ObjectId(id);
@@ -63,6 +65,8 @@ router.post("/changeState", (req, res) => {
         sprinkler.ifOn = ifOn
         sprinkler.time=time
         sprinkler.amt=amt
+        scheduler(_id+'M',time[0]);
+        scheduler(_id+'E',time[1]);
         await sprinkler.save();
         res.send("Done");
     }).catch((error) => {
@@ -118,7 +122,7 @@ router.post("/predict", async (req, res) => {
     try {
         let result = await response.json();
         let sprinkler = await Sprinkler.findOne({ _id: _id });
-        sprinkler.waterTime=result;
+        sprinkler.waterTime=parseFloat(result);
         await sprinkler.save();
         res.send("Done"); 
     }
@@ -127,14 +131,45 @@ router.post("/predict", async (req, res) => {
         res.send({ err: error })
     }
 })
-router.post("/water", async (req, res) => {
+router.post("/water/one", async (req, res) => {
     let {   sprinklerID } = req.body;
     let _id = new ObjectId(sprinklerID);
     const uri = process.env.MONGODB_CONNECTIONSTRING;
     let connection = await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     let sprinkler = await Sprinkler.findOne({ _id: _id });
-    console.log("Sending",String(amountToTime(sprinkler.waterTime*2.5)));
-    res.send(String(amountToTime(sprinkler.waterTime*2.5)));
+    let water=sprinkler.waterTime/2;
+    if(sprinkler.amt && sprinkler.amt[0])
+    water=sprinkler.amt[0];
+console.log(water);
+    console.log("Sending",String(amountToTime(water*2.5)));
+    res.send(String(amountToTime(water*2.5)));
 })
+router.post("/water/two", async (req, res) => {
+    let {   sprinklerID } = req.body;
+    let _id = new ObjectId(sprinklerID);
+    const uri = process.env.MONGODB_CONNECTIONSTRING;
+    let connection = await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    let sprinkler = await Sprinkler.findOne({ _id: _id });
+    let water=sprinkler.waterTime/2;
+    if(sprinkler.amt && sprinkler.amt[1])
+    water=sprinkler.amt[1];
+    console.log("Sending",String(amountToTime(water*2.5)));
+    res.send(String(amountToTime(water*2.5)));
+})
+router.post("/predictedWater", async (req, res) => {
+    let {   sprinklerID } = req.body;
+    let _id = new ObjectId(sprinklerID);
+    const uri = process.env.MONGODB_CONNECTIONSTRING;
+    let connection = await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    let sprinkler = await Sprinkler.findOne({ _id: _id });
+    if(sprinkler.waterTime)
+    res.send({water:sprinkler.waterTime});
+else 
+res.send({water:7})
+})
+
+
+
+
 
 module.exports = router 
