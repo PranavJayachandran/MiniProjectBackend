@@ -22,7 +22,7 @@ function jober(name) {
   if (name[name.length - 1] == "M") {
     console.log("One");
     onSprinkler("http://192.168.70.216/one");
-  }
+  } 
   else 
   onSprinkler("http://192.168.70.216/two");
 
@@ -46,5 +46,13 @@ function scheduler(jobName, timeString) {
   scheduleJobs.set(jobName, job);
   console.log(`job with ${jobName} is created for ${scheduledTime}`);
 }
+function unSchedule(jobName){
+  const oldJob = scheduleJobs.get(jobName);
+  if (oldJob) {
+    console.log("Deleting",jobName)
+    oldJob.cancel();
+    scheduleJobs.delete(jobName);
+  }
+}
 
-module.exports = { scheduler };
+module.exports = { scheduler,unSchedule };
